@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <title>JS Learning Agent ⚡</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #07071a; font-family: 'Segoe UI', system-ui, sans-serif; color: #e8e8ff; }
+    .wrap { max-width: 460px; margin: 0 auto; padding: 22px 14px 40px; position: relative; z-index: 1; }
+    .blob1 { position: fixed; top: -15%; left: -10%; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle,rgba(124,58,237,.18) 0%,transparent 70%); pointer-events: none; }
+    .blob2 { position: fixed; bottom: -10%; right: -10%; width: 350px; height: 350px; border-radius: 50%; background: radial-gradient(circle,rgba(59,130,246,.13) 0%,transparent 70%); pointer-events: none; }
+    .card { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.07); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+    .card-accent { border-color: rgba(167,139,250,.3); }
+    .btn { width: 100%; padding: 11px 0; border: none; border-radius: 10px; color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; display: block; text-align: center; text-decoration: none; margin-bottom: 8px; }
+    .btn-purple { background: #7c3aed; box-shadow: 0 4px 14px rgba(124,58,237,.4); }
+    .btn-red { background: #dc2626; box-shadow: 0 4px 14px rgba(220,38,38,.4); }
+    .btn-green { background: #059669; box-shadow: 0 4px 14px rgba(5,150,105,.4); }
+    .btn-outline { background: transparent; border: 1px solid rgba(134,239,172,.4); color: #86efac; }
+    .btn-ghost { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); color: #6b7280; width: auto; padding: 10px 16px; }
+    .nav { display: flex; gap: 6px; background: rgba(255,255,255,.04); border-radius: 12px; padding: 4px; margin-bottom: 18px; }
+    .nav-btn { flex: 1; padding: 8px 0; border: none; border-radius: 9px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .nav-active { background: rgba(109,40,217,.75); color: #fff; }
+    .nav-inactive { background: transparent; color: #7c6aab; }
+    .bar-bg { height: 7px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .tag { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+    .tag-green { background: rgba(134,239,172,.15); color: #86efac; border: 1px solid rgba(134,239,172,.3); }
+    .tag-study { background: rgba(134,239,172,.18); color: #86efac; font-size: 10px; padding: 2px 9px; border-radius: 99px; font-weight: 700; margin-left: 8px; }
+    .notif-granted { display: flex; align-items: center; gap: 10px; }
+    .row-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .road-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; margin-bottom: 6px; }
+    .road-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .toast { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); background: rgba(109,40,217,.97); color: #fff; padding: 11px 22px; border-radius: 12px; font-size: 13px; font-weight: 700; z-index: 9999; box-shadow: 0 8px 30px rgba(109,40,217,.45); border: 1px solid rgba(167,139,250,.35); white-space: nowrap; display: none; }
+    .timer-big { font-size: 38px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -1px; text-align: center; }
+    .ai-tip { font-size: 13px; line-height: 1.75; color: #d1d5db; white-space: pre-wrap; }
+    .tip-placeholder { font-size: 13px; color: #4b5563; font-style: italic; }
+    .get-tip-btn { background: rgba(109,40,217,.3); border: 1px solid rgba(167,139,250,.3); color: #a78bfa; border-radius: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="blob1"></div>
+<div class="blob2"></div>
+<div id="toast" class="toast"></div>
+<div class="wrap">
+  <div style="text-align:center;margin-bottom:24px">
+    <div style="font-size:38px;margin-bottom:2px">⚡</div>
+    <h1 style="font-size:21px;font-weight:800;color:#c4b5fd;letter-spacing:-.5px">JS Learning Agent</h1>
+    <p style="font-size:12px;color:#7c6aab;margin-top:3px">Noor ki daily study companion</p>
+    <div id="clock" style="font-size:22px;font-weight:800;color:#a78bfa;margin-top:10px;font-variant-numeric:tabular-nums"></div>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const CURRICULUM = [
+  { week:1, day:1, topic:"Arrays – Basics & Methods", query:"DSA with JavaScript Hindi arrays", emoji:"📦" },
+  { week:1, day:2, topic:"Array Loops – forEach, map, filter", query:"DSA JavaScript Hindi array loops", emoji:"🔁" },
+  { week:1, day:3, topic:"Objects & Key-Value Pairs", query:"DSA JavaScript Hindi objects", emoji:"🗂️" },
+  { week:1, day:4, topic:"Linked Lists – Concept & Node", query:"DSA JavaScript Hindi linked list", emoji:"🔗" },
+  { week:1, day:5, topic:"Linked List – Insert & Delete", query:"DSA JavaScript Hindi linked list insert delete", emoji:"✂️" },
+  { week:2, day:1, topic:"Stacks – LIFO Concept", query:"DSA JavaScript Hindi stack", emoji:"📚" },
+  { week:2, day:2, topic:"Queues – FIFO Concept", query:"DSA JavaScript Hindi queue", emoji:"🚶" },
+  { week:2, day:3, topic:"Hash Tables & Objects", query:"DSA JavaScript Hindi hash table", emoji:"🗃️" },
+  { week:2, day:4, topic:"Binary Trees – Intro", query:"DSA JavaScript Hindi binary tree", emoji:"🌲" },
+  { week:2, day:5, topic:"Tree Traversal – BFS & DFS", query:"DSA JavaScript Hindi BFS DFS", emoji:"🧭" },
+  { week:3, day:1, topic:"Sorting – Bubble & Selection", query:"DSA JavaScript Hindi bubble sort", emoji:"🔢" },
+  { week:3, day:2, topic:"Sorting – Merge Sort", query:"DSA JavaScript Hindi merge sort", emoji:"🔀" },
+  { week:3, day:3, topic:"Recursion Fundamentals", query:"DSA JavaScript Hindi recursion", emoji:"♻️" },
+  { week:3, day:4, topic:"Graph – Adjacency List", query:"DSA JavaScript Hindi graph", emoji:"🕸️" },
+  { week:3, day:5, topic:"Dynamic Programming Intro", query:"DSA JavaScript Hindi dynamic programming", emoji:"🧩" },
+];
+
+const PLAYLIST = "https://www.youtube.com/watch?v=wZHtZ_VJGKI";
+const KEY = "noor_js_v3";
+function load() { try { return JSON.parse(localStorage.getItem(KEY))||{}; } catch{return{};} }
+function save(s) { try { localStorage.setItem(KEY,JSON.stringify(s)); } catch{} }
+function ytUrl(q) { return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`; }
+function fmtTimer(s) { return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(()=>{ t.style.display='none'; }, 3000);
+}
+
+function App() {
+  const saved = load();
+  const [started, setStarted] = useState(saved.started||false);
+  const [startDate, setStartDate] = useState(saved.startDate||null);
+  const [completed, setCompleted] = useState(saved.completed||[]);
+  const [notifPerm, setNotifPerm] = useState('default');
+  const [aiTip, setAiTip] = useState('');
+  const [loadingTip, setLoadingTip] = useState(false);
+  const [sessionSec, setSessionSec] = useState(0);
+  const [sessionOn, setSessionOn] = useState(false);
+  const [view, setView] = useState('home');
+  const timerRef = useRef(null);
+  const notifRef = useRef(null);
+
+  useEffect(()=>{ save({started,startDate,completed}); },[started,startDate,completed]);
+  useEffect(()=>{ if('Notification' in window) setNotifPerm(Notification.permission); },[]);
+
+  useEffect(()=>{
+    if(!started||notifPerm!=='granted') return;
+    function sched() {
+      const next=new Date(); next.setHours(17,0,0,0);
+      if(new Date()>=next) next.setDate(next.getDate()+1);
+      notifRef.current=setTimeout(()=>{
+        const l=todayLesson();
+        new Notification('⚡ JS Study Time – Noor!',{ body: l?`Aaj: ${l.emoji} ${l.topic}\n5 PM – 7 PM!`:'🎉 Roadmap complete!' });
+        sched();
+      }, next-new Date());
+    }
+    sched();
+    return ()=>clearTimeout(notifRef.current);
+  },[started,notifPerm]);
+
+  useEffect(()=>{
+    if(sessionOn) {
+      timerRef.current=setInterval(()=>{
+        setSessionSec(s=>{ if(s>=7200){setSessionOn(false);showToast('🎉 2 ghantay complete! Shabash Noor!');return 0;} return s+1; });
+      },1000);
+    } else clearInterval(timerRef.current);
+    return ()=>clearInterval(timerRef.current);
+  },[sessionOn]);
+
+  function todayLesson() {
+    if(!startDate) return CURRICULUM[0];
+    const d=Math.floor((Date.now()-new Date(startDate))/86400000);
+    return CURRICULUM[Math.min(d,CURRICULUM.length-1)];
+  }
+  function dayIdx() {
+    if(!startDate) return 0;
+    return Math.min(Math.floor((Date.now()-new Date(startDate))/86400000),CURRICULUM.length-1);
+  }
+
+  async function requestNotif() {
+    if(!('Notification' in window)) return showToast('❌ Browser support nahi karta');
+    const r=await Notification.requestPermission();
+    setNotifPerm(r);
+    showToast(r==='granted'?'✅ Notifications on! Roz 5 PM reminder':'❌ Permission nahi mili');
+  }
+
+  function handleStart() { setStarted(true); setStartDate(new Date().toISOString()); showToast('🚀 Journey shuru ho gayi!'); }
+
+  async function fetchTip() {
+    const lesson=todayLesson();
+    setLoadingTip(true); setAiTip('');
+    try {
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:1000,
+          system:`Tum friendly JS tutor ho. Noor "${lesson.topic}" seekh rahi hai. Hinglish mein 3-4 bullet points do: kya seekhna hai, real-life misaal, practice idea, motivational line. Max 150 words. Emojis use karo.`,
+          messages:[{role:'user',content:`"${lesson.topic}" ka tip do!`}] })
+      });
+      const data=await res.json();
+      setAiTip(data.content?.map(b=>b.text||'').join('')||'Tip load nahi ho saki.');
+    } catch { setAiTip('❌ Internet check karo aur retry karo.'); }
+    setLoadingTip(false);
+  }
+
+  function markDone() {
+    const idx=dayIdx();
+    if(!completed.includes(idx)){ setCompleted(p=>[...p,idx]); showToast('✅ Lesson complete! Shabash Noor! 🌟'); }
+  }
+
+  const lesson=todayLesson(), idx=dayIdx(), isDone=completed.includes(idx);
+  const progress=Math.round((completed.length/CURRICULUM.length)*100);
+  const sessionPct=Math.min((sessionSec/7200)*100,100);
+
+  if(!started) return (
+    <div>
+      <div className="card" style={{textAlign:'center'}}>
+        <div style={{fontSize:46,marginBottom:10}}>🎯</div>
+        <h2 style={{fontSize:17,color:'#c4b5fd',marginBottom:8}}>Teri JS Study Plan</h2>
+        <p style={{color:'#7c6aab',fontSize:13,lineHeight:1.65,marginBottom:18}}>DSA with JavaScript Hindi channel se seekhna hai? Yeh agent roz 5 PM pe remind karega!</p>
+        <div className="row-item"><span style={{fontSize:13,color:'#7c6aab'}}>⏰ Daily reminder</span><span style={{fontSize:13,fontWeight:600,color:'#c4b5fd'}}>5:00 PM (roz)</span></div>
+        <div className="row-item"><span style={{fontSize:13,color:'#7c6aab'}}>📅 Session</span><span style={{fontSize:13,fontWeight:600,color:'#c4b5fd'}}>5 PM – 7 PM</span></div>
+        <div className="row-item"><span style={{fontSize:13,color:'#7c6aab'}}>📚 Lessons</span><span style={{fontSize:13,fontWeight:600,color:'#c4b5fd'}}>15 topics, 3 weeks</span></div>
+        <div style={{height:12}}/>
+        <button className="btn btn-purple" onClick={handleStart}>🚀 Journey Shuru Karo</button>
+      </div>
+      <div className="card">
+        <p style={{fontSize:13,color:'#7c6aab',marginBottom:10}}>Browser notifications allow karo taake roz 5 PM reminder mile:</p>
+        <button className="btn btn-purple" onClick={requestNotif}>🔔 Notifications On Karo</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="nav">
+        <button className={`nav-btn ${view==='home'?'nav-active':'nav-inactive'}`} onClick={()=>setView('home')}>🏠 Home</button>
+        <button className={`nav-btn ${view==='roadmap'?'nav-active':'nav-inactive'}`} onClick={()=>setView('roadmap')}>🗺️ Roadmap</button>
+      </div>
+
+      {view==='home' ? (
+        <div>
+          {/* Progress */}
+          <div className="card">
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,fontSize:13}}>
+              <span style={{color:'#8b7ec8'}}>Overall progress</span>
+              <span style={{color:'#a78bfa',fontWeight:700}}>{progress}%</span>
+            </div>
+            <div className="bar-bg"><div className="bar-fill" style={{width:`${progress}%`,background:'linear-gradient(90deg,#7c3aed,#a78bfa)'}}/></div>
+            <div style={{marginTop:7,fontSize:12,color:'#4b5563'}}>{completed.length}/{CURRICULUM.length} lessons • Week {lesson?.week}</div>
+          </div>
+
+          {/* Today */}
+          <div className="card card-accent">
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
+              <div>
+                <div style={{fontSize:10,fontWeight:700,color:'#7c3aed',textTransform:'uppercase',letterSpacing:1}}>Aaj ka Topic</div>
+                <div style={{fontSize:19,fontWeight:800,color:'#e8e8ff',marginTop:3}}>{lesson?.emoji} {lesson?.topic}</div>
+              </div>
+              {isDone && <span className="tag tag-green">✓ Done</span>}
+            </div>
+            <div style={{fontSize:12,color:'#6b7280',marginBottom:14}}>Week {lesson?.week} • Lesson {idx+1} of {CURRICULUM.length}</div>
+            <a href={PLAYLIST} target="_blank" className="btn btn-red">▶ Channel Playlist Kholo</a>
+            <a href={ytUrl(lesson?.query)} target="_blank" className="btn" style={{background:'rgba(255,255,255,.05)',color:'#a78bfa',border:'1px solid rgba(167,139,250,.2)'}}>🔍 Search "{lesson?.topic}"</a>
+            {!isDone && <button className="btn btn-outline" onClick={markDone}>✓ Aaj ki Lesson Mark Done</button>}
+          </div>
+
+          {/* AI Tip */}
+          <div className="card">
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <span style={{fontWeight:700,fontSize:14,color:'#c4b5fd'}}>🤖 AI Tutor Tip</span>
+              <button className="get-tip-btn" onClick={fetchTip} disabled={loadingTip}>{loadingTip?'Loading...':'Get Tip ✨'}</button>
+            </div>
+            {aiTip ? <div className="ai-tip">{aiTip}</div> : <div className="tip-placeholder">Get Tip dabao — AI aaj ka personalized tip dega 💡</div>}
+          </div>
+
+          {/* Timer */}
+          <div className="card">
+            <div style={{fontWeight:700,fontSize:14,color:'#c4b5fd',marginBottom:12}}>⏱️ Study Session (5PM–7PM)</div>
+            <div className="timer-big" style={{color:sessionOn?'#86efac':'#a78bfa',marginBottom:6}}>{fmtTimer(sessionSec)}</div>
+            <div style={{fontSize:11,color:'#4b5563',textAlign:'center',marginBottom:12}}>Goal: 02:00:00</div>
+            <div className="bar-bg" style={{marginBottom:12}}><div className="bar-fill" style={{width:`${sessionPct}%`,background:sessionOn?'linear-gradient(90deg,#059669,#86efac)':'linear-gradient(90deg,#7c3aed,#a78bfa)'}}/></div>
+            <div style={{display:'flex',gap:8}}>
+              <button className={`btn ${sessionOn?'btn-red':'btn-green'}`} onClick={()=>setSessionOn(v=>!v)}>{sessionOn?'⏸ Pause':'▶ Start Session'}</button>
+              {sessionSec>0 && <button className="btn-ghost" style={{borderRadius:10,cursor:'pointer',fontWeight:600,fontSize:13}} onClick={()=>{setSessionOn(false);setSessionSec(0);}}>Reset</button>}
+            </div>
+          </div>
+
+          {/* Notif */}
+          <div className="card">
+            {notifPerm==='granted'
+              ? <div className="notif-granted"><span style={{fontSize:22}}>🔔</span><div><div style={{fontWeight:700,fontSize:13,color:'#86efac'}}>Notifications Active</div><div style={{fontSize:12,color:'#4b5563'}}>Roz 5 PM pe reminder aayega</div></div></div>
+              : <button className="btn btn-purple" onClick={requestNotif}>🔔 Enable Notifications (5 PM daily)</button>
+            }
+          </div>
+        </div>
+      ) : (
+        <div className="card">
+          <div style={{fontWeight:700,fontSize:15,color:'#c4b5fd',marginBottom:18}}>📚 3-Week JS Roadmap</div>
+          {[1,2,3].map(week=>(
+            <div key={week} style={{marginBottom:20}}>
+              <div style={{fontSize:11,fontWeight:700,color:'#7c3aed',textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Week {week}</div>
+              {CURRICULUM.filter(l=>l.week===week).map(l=>{
+                const i=CURRICULUM.indexOf(l), done=completed.includes(i), isToday=i===idx;
+                return (
+                  <div key={i} className="road-item" style={{background:isToday?'rgba(109,40,217,.22)':'rgba(255,255,255,.03)',border:isToday?'1px solid rgba(167,139,250,.4)':'1px solid rgba(255,255,255,.05)'}}>
+                    <div className="road-num" style={{background:done?'rgba(134,239,172,.2)':isToday?'rgba(109,40,217,.5)':'rgba(255,255,255,.06)',color:done?'#86efac':'#a78bfa'}}>
+                      {done?'✓':i+1}
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:13,fontWeight:isToday?700:500,color:done?'#4b5563':'#e8e8ff'}}>{l.emoji} {l.topic}</div>
+                      {isToday && <div style={{fontSize:10,color:'#a78bfa',marginTop:1}}>← Aaj ka topic</div>}
+                    </div>
+                    {isToday && <a href={PLAYLIST} target="_blank" style={{fontSize:18,textDecoration:'none'}}>▶</a>}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+      <p style={{textAlign:'center',fontSize:11,color:'#1f2937',marginTop:24}}>Made with ❤️ for Noor • JS DSA 2026</p>
+    </div>
+  );
+}
+
+// Clock
+setInterval(()=>{
+  const now=new Date();
+  const t=now.toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const isStudy=now.getHours()>=17&&now.getHours()<19;
+  const el=document.getElementById('clock');
+  if(el){ el.style.color=isStudy?'#86efac':'#a78bfa'; el.innerHTML=t+(isStudy?'<span class="tag-study">STUDY TIME ✨</span>':''); }
+},1000);
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body>
+</html>
